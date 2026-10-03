@@ -1,0 +1,36 @@
+name: Build Sarangi plugin
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure
+        run: cmake -S . -B build -G "Visual Studio 17 2022" -A x64
+      - name: Build
+        run: cmake --build build --config Release --parallel
+      - name: Upload VST3
+        uses: actions/upload-artifact@v4
+        with:
+          name: Sarangi-Windows-VST3
+          path: build/Sarangi_artefacts/Release/VST3/Sarangi.vst3
+
+  macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure
+        run: cmake -S . -B build -G Xcode -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64"
+      - name: Build
+        run: cmake --build build --config Release --parallel
+      - name: Upload VST3 and AU
+        uses: actions/upload-artifact@v4
+        with:
+          name: Sarangi-macOS
+          path: |
+            build/Sarangi_artefacts/Release/VST3/Sarangi.vst3
+            build/Sarangi_artefacts/Release/AU/Sarangi.component
